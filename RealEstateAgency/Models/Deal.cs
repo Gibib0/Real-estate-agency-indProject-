@@ -6,9 +6,9 @@ namespace RealEstateAgency.Models
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime Date { get; set; }
-        //public Property Property { get; set; }
-        public Agent Agent { get; set; }
-        //public Client Client { get; set; }
+        public required Property Property { get; set; }
+        public required Agent Agent { get; set; }
+        public required Client Client { get; set; }
         public decimal FinalPrice { get; set; }
         public DealType Type { get; set; }
         public decimal CommissionPercent { get; set; }
