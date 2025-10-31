@@ -16,13 +16,13 @@ namespace RealEstateAgency.Services
             _deals = _jsonDataService.LoadFromFile<Deal>(_filePath);
         }
 
-        public void AddDeal(PropertyAccessors property, Agent agent, ClientCertificateOption client, decimal finalPrice, DealType dealtype, decimal commissionPercent)
+        public void AddDeal(Property property, Agent agent, Client client, decimal finalPrice, DealType dealtype, decimal commissionPercent)
         {
 
             bool exists = _deals.Any(d =>
             d.Agent.Id == agent.Id &&
-            //d.Client.Id == client.Id &&
-            //d.Type == dealType &&
+            d.Client.Id == client.Id &&
+            d.Type == dealtype &&
             d.Date.Date == DateTime.Now.Date);
 
             if (exists)
@@ -34,9 +34,9 @@ namespace RealEstateAgency.Services
             {
                 Id = Guid.NewGuid(),
                 Date = DateTime.Now,
-                //Property = property,
+                Property = property,
                 Agent = agent,
-                //Client = client,
+                Client = client,
                 FinalPrice = finalPrice,
                 Type = dealtype,
                 CommissionPercent = commissionPercent

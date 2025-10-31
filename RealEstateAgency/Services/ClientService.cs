@@ -27,5 +27,31 @@ namespace RealEstateAgency.Services
         {
             return _clients;
         }
+        public bool UpdateClient(Client updatedClient)
+        {
+            int index = _clients.FindIndex(p => p.Id == updatedClient.Id);
+
+            if (index != -1)
+            {
+                _clients[index] = updatedClient;
+                _jsonDataService.SaveToFile(_clients, _filePath);
+                return true;
+            }
+
+            return false;
+        }
+        public bool DeleteClient(Guid id)
+        {
+            var clientToRemove = _clients.FirstOrDefault(p => p.Id == id);
+
+            if (clientToRemove != null)
+            {
+                _clients.Remove(clientToRemove);
+                _jsonDataService.SaveToFile(_clients, _filePath);
+                return true;
+            }
+
+            return false;
+        }
     }
 }
