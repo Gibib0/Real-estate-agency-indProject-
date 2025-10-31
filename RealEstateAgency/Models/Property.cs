@@ -13,6 +13,7 @@ namespace RealEstateAgency.Models
         public decimal Square { get; set; }
         public string Address { get; set; }
         public decimal Price { get; set; }
+        public int Rooms { get; set; }
         public enum Status
         {
             None,
@@ -23,13 +24,16 @@ namespace RealEstateAgency.Models
         public Status CurrentStatus { get; set; }
         public Property() { }
 
-        public Property(string propertytype, decimal square, string address, decimal price)
+        public List<StatusChange> StatusHistory { get; set; } = new List<StatusChange>();
+
+        public Property(string propertytype, decimal square, string address, decimal price, int rooms)
         {
             Id = Guid.NewGuid();
             PropertyType = propertytype;
             Square = square;
             Address = address;
             Price = price;
+            Rooms = rooms;
             CurrentStatus = Status.OnSale;
         }
     }

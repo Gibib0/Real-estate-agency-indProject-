@@ -16,7 +16,11 @@ namespace RealEstateAgency.Services
         }
         public void AddClient(Client client)
         {
-            if (!_clients.Any(c => c.FullName.Equals(client.FullName, StringComparison.OrdinalIgnoreCase)))
+            if (!_clients.Any(c =>
+                c.Id == client.Id ||
+                c.FullName.Equals(client.FullName, StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrWhiteSpace(c.Email) && c.Email.Equals(client.Email, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrWhiteSpace(c.Phone) && c.Phone.Equals(client.Phone))))
             {
                 _clients.Add(client);
                 _jsonDataService.SaveToFile(_clients, _filePath);
