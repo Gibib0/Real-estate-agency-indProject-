@@ -1,12 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RealEstateAgency.Services
 {
     public class JSONDataService
     {
-        public void SaveToFile<T>(List<T> data, string filePath) {
+        private JsonSerializerOptions GetOptions()
+        {
+            return new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
+            };
+        }
+        public void SaveToFile<T>(List<T> data, string filePath)
+        {
             string directory = Path.GetDirectoryName(filePath);
             if (!Directory.Exists(directory))
             {

@@ -16,7 +16,8 @@ namespace RealEstateAgency.Services
 
         public void AddAgent(Agent agent)
         {
-            if (!_agents.Any(a => a.FullName.Equals(agent.FullName, StringComparison.OrdinalIgnoreCase)))
+            if (!_agents.Any(a => a.Id == agent.Id ||
+                a.FullName.Equals(agent.FullName, StringComparison.OrdinalIgnoreCase)))
             {
                 _agents.Add(agent);
                 _jsonDataService.SaveToFile(_agents, _filePath);
