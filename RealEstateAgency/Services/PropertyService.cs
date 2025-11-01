@@ -1,6 +1,7 @@
 ﻿using RealEstateAgency.Models;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace RealEstateAgency.Services
 {
@@ -107,6 +108,16 @@ namespace RealEstateAgency.Services
             if (!string.IsNullOrWhiteSpace(filter.PropertyType))
             {
                 query = query.Where(p => !string.IsNullOrWhiteSpace(p.PropertyType) && p.PropertyType.Equals(filter.PropertyType, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.District))
+            {
+                query = query.Where(p => !string.IsNullOrWhiteSpace(p.District) && p.District.Equals(filter.District, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if(!string.IsNullOrWhiteSpace(filter.Landmark))
+            {
+                query = query.Where(p => !string.IsNullOrWhiteSpace(p.Landmark) && p.Landmark.Equals(filter.Landmark, StringComparison.OrdinalIgnoreCase));
             }
 
             if (filter.MinPrice.HasValue)

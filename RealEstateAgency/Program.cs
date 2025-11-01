@@ -15,15 +15,15 @@ namespace RealEstateAgency
             var propertyService = new PropertyService();
             var clientService = new ClientService();
 
-            propertyService.AddProperty(new Property("House", 344, "Privet Drive 3/62", 350000, 6));
-            propertyService.AddProperty(new Property("Flat", 40, "Broker Street 25/12", 20000, 1));
-            propertyService.AddProperty(new Property("Flat", 9, "Some Avenue 9", 5500, 3));
-            propertyService.AddProperty(new Property("House", 65, "Green Road 7/1", 120000, 4));
+            propertyService.AddProperty(new Property("House", 344, "Privet Drive 3/62", 350000, 6, "West", "Supermarket"));
+            propertyService.AddProperty(new Property("Flat", 40, "Broker Street 25/12", 20000, 1, "East", "Subway"));
+            propertyService.AddProperty(new Property("Flat", 9, "Some Avenue 9", 5500, 3, "West", "Subway"));
+            propertyService.AddProperty(new Property("House", 65, "Green Road 7/1", 120000, 4, "North", "School"));
             var allProperty = propertyService.GetProperties();
             Console.WriteLine($"Properties: {allProperty.Count}");
             foreach (var a in allProperty)
             {
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}");
+                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmark: {a.Landmark}");
             }
             var NewProperty = allProperty[0];
             NewProperty.Address = "Beverly Hills 90210";
@@ -31,13 +31,13 @@ namespace RealEstateAgency
             Console.WriteLine("\n");
             foreach (var a in allProperty)
             {
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}");
+                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmark: {a.Landmark}");
             }
             propertyService.DeleteProperty(allProperty[1].Id);
             Console.WriteLine($"Properties: {allProperty.Count}");
             foreach (var a in allProperty)
             {
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}");
+                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmark: {a.Landmark}");
             }
 
             clientService.AddClient(new Client("Vasya Pupkin", "vasyapupkin@example.com", "+38(096)1234567"));
@@ -83,6 +83,7 @@ namespace RealEstateAgency
             foreach (var a in allDeals)
             {
                 Console.WriteLine($" Property: {a.Property.PropertyType}, Agent: {a.Agent.FullName}, Client: {a.Client.FullName}, Price: {a.FinalPrice}, Type: {a.Type}, Percent: {a.CommissionPercent}");
+                Console.WriteLine($" Amount: {a.CommissionAmount}, Final Price: {a.FinalPrice + a.CommissionAmount}");
             }
 
 
@@ -90,20 +91,20 @@ namespace RealEstateAgency
             Console.WriteLine("\nFilters");
             var filter = new PropertyFilter
             {
-                PropertyType = "Flat",
-                MinPrice = 5000,
-                MaxPrice = 130000,
-                MinArea = 10,
-                MaxArea = 70,
+                PropertyType = "House",
+                MinPrice = 350000,
+                MaxPrice = 350000,
+                MinArea = 344,
+                MaxArea = 344,
                 MinRooms = 1,
-                MaxRooms = 4
+                MaxRooms = 7,
             };
 
             var filtered = propertyService.GetPropertiesByFilters(filter);
             Console.WriteLine($"Filtered properties: {filtered.Count()}");
             foreach (var p in filtered)
             {
-                Console.WriteLine($" - {p.PropertyType}, {p.Square}m^2, {p.Address}, {p.Rooms} rooms, {p.Price}$");
+                Console.WriteLine($" - {p.PropertyType}, {p.Square}m^2, {p.Address}, {p.Rooms} rooms, {p.Price}$, {p.District} district, landmark: {p.Landmark}");
             }
 
             Console.WriteLine("\nStatuses");

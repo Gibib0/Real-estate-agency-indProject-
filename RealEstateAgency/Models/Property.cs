@@ -14,6 +14,8 @@ namespace RealEstateAgency.Models
         public string Address { get; set; }
         public decimal Price { get; set; }
         public int Rooms { get; set; }
+        public string District { get; set; }
+        public string Landmark { get; set; }
         public enum Status
         {
             None,
@@ -26,7 +28,7 @@ namespace RealEstateAgency.Models
 
         public List<StatusChange> StatusHistory { get; set; } = new List<StatusChange>();
 
-        public Property(string propertytype, decimal square, string address, decimal price, int rooms)
+        public Property(string propertytype, decimal square, string address, decimal price, int rooms, string district, string landmark)
         {
             Id = Guid.NewGuid();
             PropertyType = propertytype;
@@ -34,6 +36,8 @@ namespace RealEstateAgency.Models
             Address = address;
             Price = price;
             Rooms = rooms;
+            District = district;
+            Landmark = landmark;
             CurrentStatus = Status.OnSale;
         }
     }
