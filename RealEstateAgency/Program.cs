@@ -15,29 +15,42 @@ namespace RealEstateAgency
             var propertyService = new PropertyService();
             var clientService = new ClientService();
 
-            propertyService.AddProperty(new Property("House", 344, "Privet Drive 3/62", 350000, 6, "West", "Supermarket"));
-            propertyService.AddProperty(new Property("Flat", 40, "Broker Street 25/12", 20000, 1, "East", "Subway"));
-            propertyService.AddProperty(new Property("Flat", 9, "Some Avenue 9", 5500, 3, "West", "Subway"));
-            propertyService.AddProperty(new Property("House", 65, "Green Road 7/1", 120000, 4, "North", "School"));
+            propertyService.AddProperty(new Property("House", 344, "Privet Drive 3/62", 350000, 6, "West", new List<LandmarkInfo>
+            {
+                new LandmarkInfo("Park", 5),
+                new LandmarkInfo("Subway", 10),
+                new LandmarkInfo("Supermarket", 3)
+            }));
+            propertyService.AddProperty(new Property("Flat", 40, "Broker Street 25/12", 20000, 1, "East", new List<LandmarkInfo>
+            {
+                new LandmarkInfo("School", 5),
+                new LandmarkInfo("Subway", 10),
+                new LandmarkInfo("Supermarket", 3)
+            }));
+
             var allProperty = propertyService.GetProperties();
             Console.WriteLine($"Properties: {allProperty.Count}");
             foreach (var a in allProperty)
             {
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmark: {a.Landmark}");
+                var landmarksString = string.Join(", ", a.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
+                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmarks: [{landmarksString}]");
             }
+        
             var NewProperty = allProperty[0];
             NewProperty.Address = "Beverly Hills 90210";
             propertyService.UpdateProperty(NewProperty);
             Console.WriteLine("\n");
             foreach (var a in allProperty)
             {
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmark: {a.Landmark}");
+                var landmarksString = string.Join(", ", a.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
+                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmarks: [{landmarksString}]");
             }
             propertyService.DeleteProperty(allProperty[1].Id);
             Console.WriteLine($"Properties: {allProperty.Count}");
             foreach (var a in allProperty)
             {
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmark: {a.Landmark}");
+                var landmarksString = string.Join(", ", a.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
+                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmarks: [{landmarksString}]");
             }
 
             clientService.AddClient(new Client("Vasya Pupkin", "vasyapupkin@example.com", "+38(096)1234567"));
@@ -104,7 +117,8 @@ namespace RealEstateAgency
             Console.WriteLine($"Filtered properties: {filtered.Count()}");
             foreach (var p in filtered)
             {
-                Console.WriteLine($" - {p.PropertyType}, {p.Square}m^2, {p.Address}, {p.Rooms} rooms, {p.Price}$, {p.District} district, landmark: {p.Landmark}");
+                var landmarksString = string.Join(", ", p.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
+                Console.WriteLine($" - {p.PropertyType}, {p.Square}m^2, {p.Address}, {p.Rooms} rooms, {p.Price}$, {p.District} district, landmarks: [{landmarksString}]");
             }
 
             var savedSearchService = new SavedSearchService();
@@ -149,6 +163,28 @@ namespace RealEstateAgency
             foreach (var record in history)
             {
                 Console.WriteLine($" - {record.Time}: {record.OldStatus} -> {record.NewStatus}, by {record.ChangeBy}");
+            }
+            
+            DateTime startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
+            int dealsThisMonth = DealStatsService.GetDealCountForPeriod(allDeals, startOfMonth, endOfMonth);
+            Console.WriteLine($"In this month was {dealsThisMonth} deals");
+
+            decimal totalSales = DealStatsService.GetTotalSalesAmount(allDeals);
+            Console.WriteLine($"Total sales: {totalSales}");
+
+            decimal avgPricePerSqm = DealStatsService.GetAveragePricePerSquareMeter(allDeals);
+            Console.WriteLine($"Average price per square meter: {avgPricePerSqm}");
+
+            List<AgentEfficiencyStats> agentStats = DealStatsService.GetAgentEfficiency(allDeals);
+            foreach (var a in agentStats)
+            {
+                Console.WriteLine($" - {a.AgentName}, {a.DealCount}, {a.TotalCommission}");
+            }
+            List<ClientActivityStats> clientStats = DealStatsService.GetMostActiveClients(allDeals);
+            foreach (var a in clientStats)
+            {
+                Console.WriteLine($" - {a.ClientName}, {a.DealCount}");
             }
 
             Console.WriteLine("\nPress any key");
