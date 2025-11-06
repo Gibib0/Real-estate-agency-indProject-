@@ -107,7 +107,35 @@ namespace RealEstateAgency
                 Console.WriteLine($" - {p.PropertyType}, {p.Square}m^2, {p.Address}, {p.Rooms} rooms, {p.Price}$, {p.District} district, landmark: {p.Landmark}");
             }
 
-            Console.WriteLine("\nStatuses");
+            var savedSearchService = new SavedSearchService();
+            if (allClients != null && allClients.Count > 0)
+            {
+                var clientForSave = allClients[0];
+                string description = $"Saved filter: {filter.PropertyType}, price {filter.MinPrice}-{filter.MaxPrice}, area {filter.MinArea}-{filter.MaxArea}, rooms {filter.MinRooms}-{filter.MaxRooms}";
+
+                savedSearchService.AddSavedSearch(clientForSave.Id, filter, description);
+                Console.WriteLine($"\nFilter saved for client: {clientForSave.FullName}");
+            }
+            else
+            {
+                Console.WriteLine("\nNo clients available - ckipping saved search creation.");
+            }
+
+            if (allClients != null && allClients.Count > 0)
+            {
+                var clientForLoad = allClients[0];
+                var previousSearches = savedSearchService.GetSavedSearches(clientForLoad.Id);
+
+                Console.WriteLine($"\nSaved searches for {clientForLoad.FullName}: {previousSearches}");
+                foreach (var s in previousSearches)
+                {
+                    var f = s.Filter;
+                    Console.WriteLine($" - [{s.DateSaved}] {s.Description} => Type:{f.PropertyType}, Price:{f.MinPrice}-{f.MaxPrice}, Area:{f.MinArea}-{f.MaxArea}, Rooms:{f.MinRooms}-{f.MaxRooms}");
+                }
+            }
+
+
+                Console.WriteLine("\nStatuses");
             var prop = propertyService.GetProperties().First();
             Console.WriteLine($"Initial status of {prop.Address}: {prop.CurrentStatus}");
 
