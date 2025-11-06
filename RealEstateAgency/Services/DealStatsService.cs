@@ -31,7 +31,7 @@ namespace RealEstateAgency.Services
             var deals = FilterByDate(allDeals, startDate, endDate);
 
             return deals
-                .Where(d => d.Type == DealType.Purchase) // Вважаємо "продажем" тільки купівлю
+                .Where(d => d.Type == DealType.Purchase)
                 .Sum(d => d.FinalPrice);
         }
         public static decimal GetAveragePricePerSquareMeter(List<Deal> allDeals, DateTime? startDate = null, DateTime? endDate = null)

@@ -115,9 +115,11 @@ namespace RealEstateAgency.Services
                 query = query.Where(p => !string.IsNullOrWhiteSpace(p.District) && p.District.Equals(filter.District, StringComparison.OrdinalIgnoreCase));
             }
 
-            if(!string.IsNullOrWhiteSpace(filter.Landmark))
+            if (!string.IsNullOrWhiteSpace(filter.Landmark))
             {
-                query = query.Where(p => !string.IsNullOrWhiteSpace(p.Landmark) && p.Landmark.Equals(filter.Landmark, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(p => p.Landmarks != null && p.Landmarks.Any(landmarkInfo => landmarkInfo.Name.Equals(filter.Landmark, StringComparison.OrdinalIgnoreCase) &&
+                (!filter.MaxTravelTime.HasValue || landmarkInfo.TravelTimeMinutes <= filter.MaxTravelTime.Value)
+                ));
             }
 
             if (filter.MinPrice.HasValue)
