@@ -7,6 +7,7 @@ namespace RealEstateAgency.Models
         public string PropertyType { get; set; }
         public string District { get; set; }
         public string Landmark { get; set; }
+        public int? MaxTravelTime { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
         public decimal? MinArea { get; set; }
