@@ -1,194 +1,146 @@
-﻿// просто проверка
-
-using RealEstateAgency.Models;
+﻿using RealEstateAgency.Models;
 using RealEstateAgency.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RealEstateAgency
 {
     class Program
     {
+        private static readonly AgentService _agentService = new AgentService();
+        private static readonly DealService _dealService = new DealService();
+        private static readonly PropertyService _propertyService = new PropertyService();
+        private static readonly ClientService _clientService = new ClientService();
+        private static readonly SavedSearchService _savedSearchService = new SavedSearchService();
+        private static readonly MatchingService _matchingService = new MatchingService(_propertyService, _savedSearchService);
+
         static void Main(string[] args)
         {
-            var agentService = new AgentService();
-            var dealService = new DealService();
-            var propertyService = new PropertyService();
-            var clientService = new ClientService();
+            SeedData();
 
-            propertyService.AddProperty(new Property("House", 344, "Privet Drive 3/62", 350000, 6, "West", new List<LandmarkInfo>
+            bool isRunning = true;
+            while (isRunning)
             {
-                new LandmarkInfo("Park", 5),
-                new LandmarkInfo("Subway", 10),
-                new LandmarkInfo("Supermarket", 3)
-            }));
-            propertyService.AddProperty(new Property("Flat", 40, "Broker Street 25/12", 20000, 1, "East", new List<LandmarkInfo>
-            {
-                new LandmarkInfo("School", 5),
-                new LandmarkInfo("Subway", 10),
-                new LandmarkInfo("Supermarket", 3)
-            }));
+                Console.Clear();
+                Console.WriteLine("=== WELCOME TO OUR REAL ESTATE AGENCY! ===");
+                Console.WriteLine("Who are you?");
+                Console.WriteLine("1. Manager");
+                Console.WriteLine("2. Agent");
+                Console.WriteLine("3. Client");
+                Console.WriteLine("0. Exit");
+                Console.Write("Choose the option: ");
+                string choice = Console.ReadLine().ToUpper();
 
-            var allProperty = propertyService.GetProperties();
-            Console.WriteLine($"Properties: {allProperty.Count}");
-            foreach (var a in allProperty)
-            {
-                var landmarksString = string.Join(", ", a.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmarks: [{landmarksString}]");
-            }
-        
-            var NewProperty = allProperty[0];
-            NewProperty.Address = "Beverly Hills 90210";
-            propertyService.UpdateProperty(NewProperty);
-            Console.WriteLine("\n");
-            foreach (var a in allProperty)
-            {
-                var landmarksString = string.Join(", ", a.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmarks: [{landmarksString}]");
-            }
-            propertyService.DeleteProperty(allProperty[1].Id);
-            Console.WriteLine($"Properties: {allProperty.Count}");
-            foreach (var a in allProperty)
-            {
-                var landmarksString = string.Join(", ", a.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
-                Console.WriteLine($" Type: {a.PropertyType}, Square: {a.Square}, Address: {a.Address}, Rooms: {a.Rooms}, Price: {a.Price}, District: {a.District}, Landmarks: [{landmarksString}]");
-            }
-
-            clientService.AddClient(new Client("Vasya Pupkin", "vasyapupkin@example.com", "+38(096)1234567"));
-            clientService.AddClient(new Client("John Smith", "johnsmith@example.com", "+38(093)4815162"));
-            var allClients = clientService.GetClients();
-            Console.WriteLine($"Clients: {allClients.Count}");
-            foreach (var a in allClients)
-            {
-                Console.WriteLine($" Name: {a.FullName}, E-Mail: {a.Email}, Phone: {a.Phone}");
-            }
-            var NewClient = allClients[0];
-            NewClient.Phone = "+38(050)2233344";
-            clientService.UpdateClient(NewClient);
-            Console.WriteLine("\n");
-            foreach (var a in allClients)
-            {
-                Console.WriteLine($" Name: {a.FullName}, E-Mail: {a.Email}, Phone: {a.Phone}");
-            }
-            clientService.DeleteClient(allClients[1].Id);
-            Console.WriteLine($"Clients: {allClients.Count}");
-            foreach (var a in allClients)
-            {
-                Console.WriteLine($" Name: {a.FullName}, E-Mail: {a.Email}, Phone: {a.Phone}");
-            }
-
-            agentService.AddAgent(new Agent("Ivanov Ivan", 3));
-            agentService.AddAgent(new Agent("Romanenko Roman", 5));
-
-            Console.WriteLine("Agents added");
-
-            var allAgents = agentService.GetAgents();
-            Console.WriteLine($"Agents: {allAgents.Count}");
-
-            foreach (var a in allAgents)
-            {
-                Console.WriteLine($" - {a.FullName}, Exp: {a.Experience} years");
-            }
-
-
-            dealService.AddDeal(allProperty[0], allAgents[0], allClients[0], 350000, 0, 3);
-            var allDeals = dealService.GetDeals();
-            Console.WriteLine($"Deals: {allDeals.Count}");
-            foreach (var a in allDeals)
-            {
-                Console.WriteLine($" Property: {a.Property.PropertyType}, Agent: {a.Agent.FullName}, Client: {a.Client.FullName}, Price: {a.FinalPrice}, Type: {a.Type}, Percent: {a.CommissionPercent}");
-                Console.WriteLine($" Amount: {a.CommissionAmount}, Final Price: {a.FinalPrice + a.CommissionAmount}");
-            }
-
-
-
-            Console.WriteLine("\nFilters");
-            var filter = new PropertyFilter
-            {
-                PropertyType = "House",
-                MinPrice = 350000,
-                MaxPrice = 350000,
-                MinArea = 344,
-                MaxArea = 344,
-                MinRooms = 1,
-                MaxRooms = 7,
-            };
-
-            var filtered = propertyService.GetPropertiesByFilters(filter);
-            Console.WriteLine($"Filtered properties: {filtered.Count()}");
-            foreach (var p in filtered)
-            {
-                var landmarksString = string.Join(", ", p.Landmarks.Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
-                Console.WriteLine($" - {p.PropertyType}, {p.Square}m^2, {p.Address}, {p.Rooms} rooms, {p.Price}$, {p.District} district, landmarks: [{landmarksString}]");
-            }
-
-            var savedSearchService = new SavedSearchService();
-            if (allClients != null && allClients.Count > 0)
-            {
-                var clientForSave = allClients[0];
-                string description = $"Saved filter: {filter.PropertyType}, price {filter.MinPrice}-{filter.MaxPrice}, area {filter.MinArea}-{filter.MaxArea}, rooms {filter.MinRooms}-{filter.MaxRooms}";
-
-                savedSearchService.AddSavedSearch(clientForSave.Id, filter, description);
-                Console.WriteLine($"\nFilter saved for client: {clientForSave.FullName}");
-            }
-            else
-            {
-                Console.WriteLine("\nNo clients available - ckipping saved search creation.");
-            }
-
-            if (allClients != null && allClients.Count > 0)
-            {
-                var clientForLoad = allClients[0];
-                var previousSearches = savedSearchService.GetSavedSearches(clientForLoad.Id);
-
-                Console.WriteLine($"\nSaved searches for {clientForLoad.FullName}: {previousSearches}");
-                foreach (var s in previousSearches)
+                switch (choice)
                 {
-                    var f = s.Filter;
-                    Console.WriteLine($" - [{s.DateSaved}] {s.Description} => Type:{f.PropertyType}, Price:{f.MinPrice}-{f.MaxPrice}, Area:{f.MinArea}-{f.MaxArea}, Rooms:{f.MinRooms}-{f.MaxRooms}");
+                    case "1":
+                        var managerMenu = new ManagerMenu(_agentService, _propertyService, _clientService, _dealService);
+                        managerMenu.Run();
+                        break;
+                    case "2":
+                        Agent currentAgent = SelectAgent();
+                        if (currentAgent != null)
+                        {
+                            var agentMenu = new AgentMenu(currentAgent, _agentService, _propertyService, _clientService, _dealService, _savedSearchService, _matchingService);
+                            agentMenu.Run();
+                        }
+                        break;
+                    case "3":
+                        Client currentClient = SelectClient();
+                        if (currentClient != null)
+                        {
+                            var clientMenu = new ClientMenu(currentClient, _propertyService, _dealService, _savedSearchService, _matchingService);
+                            clientMenu.Run();
+                        }
+                        break;
+                    case "0":
+                        isRunning = false;
+                        break;
+                    default:
+                        Console.WriteLine("Wrong choice. Try again.");
+                        Console.ReadKey();
+                        break;
                 }
             }
+        }
 
-
-                Console.WriteLine("\nStatuses");
-            var prop = propertyService.GetProperties().First();
-            Console.WriteLine($"Initial status of {prop.Address}: {prop.CurrentStatus}");
-
-            propertyService.ChangePropertyStatus(prop.Id, Property.Status.Rent, "Romanenko Roman");
-            propertyService.ChangePropertyStatus(prop.Id, Property.Status.Sold, "Romanenko Roman");
-
-            Console.WriteLine($"New status of {prop.Address}: {prop.CurrentStatus}");
-
-            var history = propertyService.GetStatusHistory(prop.Id);
-            Console.WriteLine($"Status history for {prop.Address}:");
-            foreach (var record in history)
+        private static Agent SelectAgent()
+        {
+            var agents = _agentService.GetAgents();
+            if (!agents.Any())
             {
-                Console.WriteLine($" - {record.Time}: {record.OldStatus} -> {record.NewStatus}, by {record.ChangeBy}");
-            }
-            
-            DateTime startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            DateTime endOfMonth = startOfMonth.AddMonths(1).AddDays(-1);
-            int dealsThisMonth = DealStatsService.GetDealCountForPeriod(allDeals, startOfMonth, endOfMonth);
-            Console.WriteLine($"In this month was {dealsThisMonth} deals");
-
-            decimal totalSales = DealStatsService.GetTotalSalesAmount(allDeals);
-            Console.WriteLine($"Total sales: {totalSales}");
-
-            decimal avgPricePerSqm = DealStatsService.GetAveragePricePerSquareMeter(allDeals);
-            Console.WriteLine($"Average price per square meter: {avgPricePerSqm}");
-
-            List<AgentEfficiencyStats> agentStats = DealStatsService.GetAgentEfficiency(allDeals);
-            foreach (var a in agentStats)
-            {
-                Console.WriteLine($" - {a.AgentName}, {a.DealCount}, {a.TotalCommission}");
-            }
-            List<ClientActivityStats> clientStats = DealStatsService.GetMostActiveClients(allDeals);
-            foreach (var a in clientStats)
-            {
-                Console.WriteLine($" - {a.ClientName}, {a.DealCount}");
+                Console.WriteLine("There are not any agents. Tell to your manager.");
+                ConsoleHelpers.PressAnyKeyToContinue();
+                return null;
             }
 
-            Console.WriteLine("\nPress any key");
-            Console.ReadLine();
+            Console.WriteLine("Choose your user:");
+            for (int i = 0; i < agents.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {agents[i].FullName}");
+            }
+
+            int choice = ConsoleHelpers.GetInt("Agent number:") - 1;
+            if (choice >= 0 && choice < agents.Count)
+            {
+                return agents[choice];
+            }
+            Console.WriteLine("Wrong choice.");
+            ConsoleHelpers.PressAnyKeyToContinue();
+            return null;
+        }
+
+        private static Client SelectClient()
+        {
+            var clients = _clientService.GetClients();
+            if (!clients.Any())
+            {
+                Console.WriteLine("There are not any clients. Tell to agent.");
+                ConsoleHelpers.PressAnyKeyToContinue();
+                return null;
+            }
+
+            Console.WriteLine("Choose your user:");
+            for (int i = 0; i < clients.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {clients[i].FullName} ({clients[i].Email})");
+            }
+
+            int choice = ConsoleHelpers.GetInt("Client number:") - 1;
+            if (choice >= 0 && choice < clients.Count)
+            {
+                return clients[choice];
+            }
+            Console.WriteLine("Wrong choice.");
+            ConsoleHelpers.PressAnyKeyToContinue();
+            return null;
+        }
+
+        private static void SeedData()
+        {
+            if (!_agentService.GetAgents().Any())
+            {
+                _agentService.AddAgent(new Agent("Ivanov Ivan", 3));
+                _agentService.AddAgent(new Agent("Romanenko Roman", 5));
+            }
+            if (!_clientService.GetClients().Any())
+            {
+                _clientService.AddClient(new Client("Vasya Pupkin", "vasyapupkin@example.com", "+38(096)1234567"));
+                _clientService.AddClient(new Client("John Smith", "johnsmith@example.com", "+38(093)4815162"));
+            }
+            if (!_propertyService.GetProperties().Any())
+            {
+                _propertyService.AddProperty(new Property("House", 344m, "Privet Drive 3/62", 350000m, 6, "West", new List<LandmarkInfo>
+                {
+                    new LandmarkInfo("Park", 5),
+                    new LandmarkInfo("Subway", 10),
+                }));
+                _propertyService.AddProperty(new Property("Flat", 40m, "Broker Street 25/12", 20000m, 1, "East", new List<LandmarkInfo>
+                {
+                    new LandmarkInfo("School", 5),
+                }));
+            }
         }
     }
 }
