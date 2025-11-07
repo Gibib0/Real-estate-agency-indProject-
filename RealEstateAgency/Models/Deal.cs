@@ -12,9 +12,18 @@ namespace RealEstateAgency.Models
         public decimal FinalPrice { get; set; }
         public DealType Type { get; set; }
         public decimal CommissionPercent { get; set; }
+        public decimal BasePrice
+        {
+            get
+            {
+                decimal multiplier = 1 + (CommissionPercent / 100);
+                if (multiplier == 0) return 0;
+                return Math.Round(FinalPrice / multiplier, 2);
+            }
+        }
         public decimal CommissionAmount
         {
-            get { return FinalPrice * CommissionPercent / 100; }
+            get { return FinalPrice - BasePrice; }
         }
     }
 }
