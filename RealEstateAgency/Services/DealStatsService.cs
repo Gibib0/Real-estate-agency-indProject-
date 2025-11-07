@@ -32,7 +32,7 @@ namespace RealEstateAgency.Services
 
             return deals
                 .Where(d => d.Type == DealType.Purchase)
-                .Sum(d => d.FinalPrice);
+                .Sum(d => d.BasePrice);
         }
         public static decimal GetAveragePricePerSquareMeter(List<Deal> allDeals, DateTime? startDate = null, DateTime? endDate = null)
         {
@@ -45,7 +45,7 @@ namespace RealEstateAgency.Services
                 return 0;
             }
 
-            decimal totalPrice = purchaseDeals.Sum(d => d.FinalPrice);
+            decimal totalPrice = purchaseDeals.Sum(d => d.BasePrice);
             decimal totalSquare = purchaseDeals.Sum(d => d.Property.Square);
 
             return (totalSquare == 0) ? 0 : (totalPrice / totalSquare);
