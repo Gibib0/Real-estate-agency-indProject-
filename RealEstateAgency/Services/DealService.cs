@@ -50,5 +50,17 @@ namespace RealEstateAgency.Services
         {
             return _deals;
         }
+
+        public decimal GetTotalComissionIncome()
+        {
+            return _deals.Sum(d => d.CommissionAmount);
+        }
+
+        public decimal GetAgentComissionIncome(Guid agentId)
+        {
+            return _deals
+                .Where(d => d.Agent.Id == agentId)
+                .Sum(d => d.CommissionAmount);
+        }
     }
 }

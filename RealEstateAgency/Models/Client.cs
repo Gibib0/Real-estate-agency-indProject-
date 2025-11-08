@@ -15,8 +15,8 @@ namespace RealEstateAgency.Models
         public string Phone { get; set; }
         public enum ClientType
         {
-            None,
             Buyer,
+            Seller,
             Owner
         }
         public ClientType CurrentType { get; set; }

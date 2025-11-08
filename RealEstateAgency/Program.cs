@@ -50,7 +50,7 @@ namespace RealEstateAgency
                         Client currentClient = SelectClient();
                         if (currentClient != null)
                         {
-                            var clientMenu = new ClientMenu(currentClient, _propertyService, _dealService, _savedSearchService, _matchingService);
+                            var clientMenu = new ClientMenu(currentClient, _propertyService, _dealService, _savedSearchService);
                             clientMenu.Run();
                         }
                         break;
