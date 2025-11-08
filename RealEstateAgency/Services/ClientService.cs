@@ -31,6 +31,12 @@ namespace RealEstateAgency.Services
         {
             return _clients;
         }
+
+        public List<Client> GetClientByType(Client.ClientType type)
+        {
+            return _clients.Where(c => c.CurrentType == type).ToList();
+        }
+
         public bool UpdateClient(Client updatedClient)
         {
             int index = _clients.FindIndex(p => p.Id == updatedClient.Id);

@@ -3,6 +3,7 @@ using RealEstateAgency.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static RealEstateAgency.Models.Client;
 
 namespace RealEstateAgency
 {
@@ -34,6 +35,8 @@ namespace RealEstateAgency
                 Console.WriteLine("4. Get all clients");
                 Console.WriteLine("5. Get all deals");
                 Console.WriteLine("6. Get stats");
+                Console.WriteLine("7. Get clients by role");
+                Console.WriteLine("8. Get agency income");
                 Console.WriteLine("0. Back");
 
                 string choice = ConsoleHelpers.GetString("Your choice:").ToUpper();
@@ -56,6 +59,12 @@ namespace RealEstateAgency
                         break;
                     case "6":
                         ViewStatistics();
+                        break;
+                    case "7":
+                        ViewClientsByRole();
+                        break;
+                    case "8":
+                        ViewAgencyIncome();
                         break;
                     case "0":
                         isRunning = false;
@@ -176,6 +185,58 @@ namespace RealEstateAgency
 
             int dealsThisMonth = DealStatsService.GetDealCountForPeriod(allDeals, DateTime.Now.AddMonths(-1), DateTime.Now);
             Console.WriteLine($"Deals for last month: {dealsThisMonth}");
+        }
+
+        private void ViewClientsByRole()
+        {
+            Console.WriteLine("---Clients by role ---");
+            Console.WriteLine("Select role: ");
+            Console.WriteLine("1. Buyer");
+            Console.WriteLine("2. Seller");
+            Console.WriteLine("3. Owner");
+            string choice = Console.ReadLine();
+
+            Client.ClientType? selectedRole = null;
+
+            switch (choice)
+            {
+                case "1":
+                    selectedRole = Client.ClientType.Buyer;
+                    break;
+                case "2":
+                    selectedRole = Client.ClientType.Seller;
+                    break;
+                case "3":
+                    selectedRole = Client.ClientType.Owner;
+                    break;
+                default:
+                    selectedRole = null;
+                    break;
+            }
+
+            if (selectedRole == null)
+            {
+                Console.WriteLine("Wrong choice.");
+                return;
+            }
+
+            var clients = _clientService.GetClientByType(selectedRole.Value);
+            if (!clients.Any())
+            {
+                Console.WriteLine($"No clients with role {selectedRole}.");
+            }
+
+            Console.WriteLine($"---Clients with role {selectedRole} ---");
+            foreach (var c in clients)
+            {
+                Console.WriteLine($" - {c.FullName}, Email: {c.Email}, Tel: {c.Phone}");
+            }
+        }
+        private void ViewAgencyIncome()
+        {
+            Console.WriteLine("--- Agency total income ---");
+            decimal totalIncome = _dealService.GetTotalComissionIncome();
+            Console.WriteLine($"Total commission earned by agency: ${totalIncome:F2}");
         }
     }
 }
