@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealEstateAgency", "RealEstateAgency\RealEstateAgency.csproj", "{06C96993-3AC5-4023-B7F9-172C4F9BC229}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Presentation", "Presentation\Presentation.csproj", "{06C96993-3AC5-4023-B7F9-172C4F9BC229}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessLogic", "BusinessLogic\BusinessLogic.csproj", "{55E38A71-0A31-4ECE-9028-371F07D8C309}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistence", "Persistence\Persistence.csproj", "{917875B1-8FA2-4F0A-A8A9-3B35A8D0E206}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{06C96993-3AC5-4023-B7F9-172C4F9BC229}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06C96993-3AC5-4023-B7F9-172C4F9BC229}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06C96993-3AC5-4023-B7F9-172C4F9BC229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55E38A71-0A31-4ECE-9028-371F07D8C309}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55E38A71-0A31-4ECE-9028-371F07D8C309}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55E38A71-0A31-4ECE-9028-371F07D8C309}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55E38A71-0A31-4ECE-9028-371F07D8C309}.Release|Any CPU.Build.0 = Release|Any CPU
+		{917875B1-8FA2-4F0A-A8A9-3B35A8D0E206}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{917875B1-8FA2-4F0A-A8A9-3B35A8D0E206}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{917875B1-8FA2-4F0A-A8A9-3B35A8D0E206}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{917875B1-8FA2-4F0A-A8A9-3B35A8D0E206}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
