@@ -17,8 +17,6 @@ namespace Presentation
 
         static void Main(string[] args)
         {
-            SeedData();
-
             bool isRunning = true;
             while (isRunning)
             {
@@ -115,32 +113,6 @@ namespace Presentation
             Console.WriteLine("Wrong choice.");
             ConsoleHelpers.PressAnyKeyToContinue();
             return null;
-        }
-
-        private static void SeedData()
-        {
-            if (!_agentService.GetAgents().Any())
-            {
-                _agentService.AddAgent(new Agent("Ivanov Ivan", 3));
-                _agentService.AddAgent(new Agent("Romanenko Roman", 5));
-            }
-            if (!_clientService.GetClients().Any())
-            {
-                _clientService.AddClient(new Client("Vasya Pupkin", "vasyapupkin@example.com", "+38(096)1234567"));
-                _clientService.AddClient(new Client("John Smith", "johnsmith@example.com", "+38(093)4815162"));
-            }
-            if (!_propertyService.GetProperties().Any())
-            {
-                _propertyService.AddProperty(new Property("House", 344m, "Privet Drive 3/62", 350000m, 6, "West", new List<LandmarkInfo>
-                {
-                    new LandmarkInfo("Park", 5),
-                    new LandmarkInfo("Subway", 10),
-                }));
-                _propertyService.AddProperty(new Property("Flat", 40m, "Broker Street 25/12", 20000m, 1, "East", new List<LandmarkInfo>
-                {
-                    new LandmarkInfo("School", 5),
-                }));
-            }
         }
     }
 }

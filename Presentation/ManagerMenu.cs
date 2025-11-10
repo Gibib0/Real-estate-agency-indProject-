@@ -37,6 +37,7 @@ namespace Presentation
                 Console.WriteLine("6. Get stats");
                 Console.WriteLine("7. Get clients by role");
                 Console.WriteLine("8. Get agency income");
+                Console.WriteLine("9. Get statuses history");
                 Console.WriteLine("0. Back");
 
                 string choice = ConsoleHelpers.GetString("Your choice:").ToUpper();
@@ -65,6 +66,9 @@ namespace Presentation
                         break;
                     case "8":
                         ViewAgencyIncome();
+                        break;
+                    case "9":
+                        ViewPropertyStatusHistory();
                         break;
                     case "0":
                         isRunning = false;
@@ -237,6 +241,46 @@ namespace Presentation
             Console.WriteLine("--- Agency total income ---");
             decimal totalIncome = _dealService.GetTotalComissionIncome();
             Console.WriteLine($"Total commission earned by agency: ${totalIncome:F2}");
+        }
+        private void ViewPropertyStatusHistory()
+        {
+            Console.WriteLine("--- Property status history ---");
+
+            var properties = _propertyService.GetProperties();
+            if (!properties.Any())
+            {
+                Console.WriteLine("There are not any properties.");
+                return;
+            }
+
+            for (int i = 0; i < properties.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {properties[i].Address} (Current: {properties[i].CurrentStatus})");
+            }
+
+            int choice = ConsoleHelpers.GetInt("Choose property for history:") - 1;
+            if (choice < 0 || choice >= properties.Count)
+            {
+                Console.WriteLine("Wrong choice.");
+                return;
+            }
+            var prop = properties[choice];
+
+            var history = _propertyService.GetStatusHistory(prop.Id);
+
+            Console.WriteLine($"\n--- {prop.Address} history ---");
+            if (!history.Any())
+            {
+                Console.WriteLine("There are not any status changes.");
+                return;
+            }
+
+            foreach (var record in history)
+            {
+                string agentName = string.IsNullOrWhiteSpace(record.ChangeBy) ? "System" : record.ChangeBy;
+                Console.WriteLine($" - [{record.Time.ToString("g")}] Status changed '{record.OldStatus}' to '{record.NewStatus}'.");
+                Console.WriteLine($"     > Changed: {agentName}");
+            }
         }
     }
 }
