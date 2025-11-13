@@ -13,7 +13,7 @@ namespace Presentation
         private readonly DealService _dealService;
         private readonly SavedSearchService _savedSearchService;
 
-        public ClientMenu(Client currentClient, PropertyService propertyService, DealService dealService, SavedSearchService savedSearchService)
+        public ClientMenu(Client currentClient, PropertyService propertyService, DealService dealService, SavedSearchService savedSearchService, MatchingService matchingService)
         {
             _currentClient = currentClient;
             _propertyService = propertyService;
