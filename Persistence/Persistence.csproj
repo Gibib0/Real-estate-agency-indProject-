@@ -7,4 +7,7 @@
 		<RootNamespace>RealEstateAgency.Persistence</RootNamespace>
 	</PropertyGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\BusinessModel\BusinessLogic.csproj" />
+	</ItemGroup>
 </Project>
