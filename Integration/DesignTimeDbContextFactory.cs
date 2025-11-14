@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
-using System.Linq; // Потрібно для .Any()
+using System.Linq;
 
 namespace Integration
 {
@@ -50,4 +50,5 @@ namespace Integration
             return new RealEstateDbContext(builder.Options);
         }
     }
+
 }
