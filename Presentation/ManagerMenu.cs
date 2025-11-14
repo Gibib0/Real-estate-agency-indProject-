@@ -3,18 +3,17 @@ using BusinessLogic.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static BusinessLogic.Models.Client;
 
 namespace Presentation
 {
     public class ManagerMenu
     {
-        private readonly AgentService _agentService;
-        private readonly PropertyService _propertyService;
-        private readonly ClientService _clientService;
-        private readonly DealService _dealService;
+        private readonly IAgentService _agentService;
+        private readonly IPropertyService _propertyService;
+        private readonly IClientService _clientService;
+        private readonly IDealService _dealService;
 
-        public ManagerMenu(AgentService agentService, PropertyService propertyService, ClientService clientService, DealService dealService)
+        public ManagerMenu(IAgentService agentService, IPropertyService propertyService, IClientService clientService, IDealService dealService)
         {
             _agentService = agentService;
             _propertyService = propertyService;
@@ -43,39 +42,17 @@ namespace Presentation
                 string choice = ConsoleHelpers.GetString("Your choice:").ToUpper();
                 switch (choice)
                 {
-                    case "1":
-                        AddAgent();
-                        break;
-                    case "2":
-                        ViewAllAgents();
-                        break;
-                    case "3":
-                        ViewAllProperties();
-                        break;
-                    case "4":
-                        ViewAllClients();
-                        break;
-                    case "5":
-                        ViewAllDeals();
-                        break;
-                    case "6":
-                        ViewStatistics();
-                        break;
-                    case "7":
-                        ViewClientsByRole();
-                        break;
-                    case "8":
-                        ViewAgencyIncome();
-                        break;
-                    case "9":
-                        ViewPropertyStatusHistory();
-                        break;
-                    case "0":
-                        isRunning = false;
-                        break;
-                    default:
-                        Console.WriteLine("Wrong choice.");
-                        break;
+                    case "1": AddAgent(); break;
+                    case "2": ViewAllAgents(); break;
+                    case "3": ViewAllProperties(); break;
+                    case "4": ViewAllClients(); break;
+                    case "5": ViewAllDeals(); break;
+                    case "6": ViewStatistics(); break;
+                    case "7": ViewClientsByRole(); break;
+                    case "8": ViewAgencyIncome(); break;
+                    case "9": ViewPropertyStatusHistory(); break;
+                    case "0": isRunning = false; break;
+                    default: Console.WriteLine("Wrong choice."); break;
                 }
                 if (isRunning) ConsoleHelpers.PressAnyKeyToContinue();
             }
@@ -101,7 +78,7 @@ namespace Presentation
             }
             foreach (var a in agents)
             {
-                Console.WriteLine($" - {a.FullName}, Expirience: {a.Experience} years");
+                Console.WriteLine($" - {a.FullName}, Expirience: {a.Experience} years, ID: {a.Id}");
             }
         }
 
@@ -148,10 +125,14 @@ namespace Presentation
             }
             foreach (var d in deals)
             {
-                Console.WriteLine($" - [{d.Date.ToShortDateString()}] {d.Type} - {d.Property.Address}");
-                Console.WriteLine($"   Agent: {d.Agent.FullName}, Client: {d.Client.FullName}, Price: ${d.FinalPrice}");
+                string propertyAddress = d.Property?.Address ?? "N/A";
+                string agentName = d.Agent?.FullName ?? "N/A";
+                string clientName = d.Client?.FullName ?? "N/A";
+
+                Console.WriteLine($" - [{d.Date.ToShortDateString()}] {d.Type} - {propertyAddress}");
+                Console.WriteLine($"   Agent: {agentName}, Client: {clientName}");
                 Console.WriteLine($"   Base Price: ${d.BasePrice:F2}");
-                Console.WriteLine($"   Commission: ${d.CommissionAmount} ({d.CommissionPercent}%)");
+                Console.WriteLine($"   Commission: ${d.CommissionAmount:F2} ({d.CommissionPercent}%)");
                 Console.WriteLine($"   Total Final Price: ${d.FinalPrice:F2}");
             }
         }
@@ -170,7 +151,7 @@ namespace Presentation
             List<AgentEfficiencyStats> agentStats = DealStatsService.GetAgentEfficiency(allDeals);
             foreach (var a in agentStats)
             {
-                Console.WriteLine($" - {a.AgentName}: {a.DealCount} deals, Total commission: ${a.TotalCommission}");
+                Console.WriteLine($" - {a.AgentName}: {a.DealCount} deals, Total commission: ${a.TotalCommission:F2}");
             }
 
             Console.WriteLine($"\n--- The most active clients ---");
@@ -182,10 +163,10 @@ namespace Presentation
 
             Console.WriteLine($"\n--- General numbers ---");
             decimal totalSales = DealStatsService.GetTotalSalesAmount(allDeals);
-            Console.WriteLine($"Total sales amount: ${totalSales}");
+            Console.WriteLine($"Total sales amount (Base Price): ${totalSales:F2}");
 
             decimal avgPricePerSqm = DealStatsService.GetAveragePricePerSquareMeter(allDeals);
-            Console.WriteLine($"Average price per m2: ${avgPricePerSqm:F2}");
+            Console.WriteLine($"Average price per m2 (Base Price): ${avgPricePerSqm:F2}");
 
             int dealsThisMonth = DealStatsService.GetDealCountForPeriod(allDeals, DateTime.Now.AddMonths(-1), DateTime.Now);
             Console.WriteLine($"Deals for last month: {dealsThisMonth}");
@@ -200,22 +181,14 @@ namespace Presentation
             Console.WriteLine("3. Owner");
             string choice = Console.ReadLine();
 
-            Client.ClientType? selectedRole = null;
+            Client.ClientType? selectedRole;
 
             switch (choice)
             {
-                case "1":
-                    selectedRole = Client.ClientType.Buyer;
-                    break;
-                case "2":
-                    selectedRole = Client.ClientType.Seller;
-                    break;
-                case "3":
-                    selectedRole = Client.ClientType.Owner;
-                    break;
-                default:
-                    selectedRole = null;
-                    break;
+                case "1": selectedRole = Client.ClientType.Buyer; break;
+                case "2": selectedRole = Client.ClientType.Seller; break;
+                case "3": selectedRole = Client.ClientType.Owner; break;
+                default: selectedRole = null; break;
             }
 
             if (selectedRole == null)
