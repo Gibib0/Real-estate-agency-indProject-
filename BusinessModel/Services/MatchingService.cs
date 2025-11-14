@@ -7,10 +7,10 @@ namespace BusinessLogic.Services
 {
     public class MatchingService
     {
-        private readonly PropertyService _propertyService;
-        private readonly SavedSearchService _savedSearchService;
+        private readonly IPropertyService _propertyService;
+        private readonly ISavedSearchService _savedSearchService;
 
-        public MatchingService(PropertyService propertyService, SavedSearchService savedSearchService)
+        public MatchingService(IPropertyService propertyService, ISavedSearchService savedSearchService)
         {
             _propertyService = propertyService;
             _savedSearchService = savedSearchService;

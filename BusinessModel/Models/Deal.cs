@@ -6,8 +6,11 @@ namespace BusinessLogic.Models
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime Date { get; set; }
+        public Guid PropertyId { get; set; }
         public required Property Property { get; set; }
+        public Guid AgentId { get; set; }
         public required Agent Agent { get; set; }
+        public Guid ClientId { get; set; }
         public required Client Client { get; set; }
         public decimal FinalPrice { get; set; }
         public DealType Type { get; set; }

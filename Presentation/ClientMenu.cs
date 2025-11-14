@@ -9,16 +9,18 @@ namespace Presentation
     public class ClientMenu
     {
         private readonly Client _currentClient;
-        private readonly PropertyService _propertyService;
-        private readonly DealService _dealService;
-        private readonly SavedSearchService _savedSearchService;
+        private readonly IPropertyService _propertyService;
+        private readonly IDealService _dealService;
+        private readonly ISavedSearchService _savedSearchService;
+        private readonly MatchingService _matchingService;
 
-        public ClientMenu(Client currentClient, PropertyService propertyService, DealService dealService, SavedSearchService savedSearchService, MatchingService matchingService)
+        public ClientMenu(Client currentClient, IPropertyService propertyService, IDealService dealService, ISavedSearchService savedSearchService, MatchingService matchingService)
         {
             _currentClient = currentClient;
             _propertyService = propertyService;
             _dealService = dealService;
             _savedSearchService = savedSearchService;
+            _matchingService = matchingService;
         }
 
         public void Run()
@@ -31,6 +33,7 @@ namespace Presentation
                 Console.WriteLine("1. Property search and save");
                 Console.WriteLine("2. Get all saved seraches");
                 Console.WriteLine("3. Get my deal history");
+                Console.WriteLine("4. Get matched properties for me");
                 Console.WriteLine("0. Back");
 
                 string choice = ConsoleHelpers.GetString("Your choice:").ToUpper();
@@ -44,6 +47,9 @@ namespace Presentation
                         break;
                     case "3":
                         ViewMyDeals();
+                        break;
+                    case "4":
+                        ViewMyMatchedProperties();
                         break;
                     case "0":
                         isRunning = false;
@@ -59,7 +65,7 @@ namespace Presentation
         private void ViewMyDeals()
         {
             Console.WriteLine($"--- ({_currentClient.FullName}) deal history ---");
-            var myDeals = _dealService.GetDeals().Where(d => d.Client.Id == _currentClient.Id).ToList();
+            var myDeals = _dealService.GetDeals().Where(d => d.ClientId == _currentClient.Id).ToList();
             if (!myDeals.Any())
             {
                 Console.WriteLine("There are not any deals.");
@@ -67,8 +73,11 @@ namespace Presentation
             }
             foreach (var d in myDeals)
             {
-                Console.WriteLine($" - [{d.Date.ToShortDateString()}] {d.Type} - {d.Property.Address}");
-                Console.WriteLine($"   Agent: {d.Agent.FullName}, Price: ${d.FinalPrice}");
+                string agentName = d.Agent?.FullName ?? "N/A";
+                string propertyAddress = d.Property?.Address ?? "N/A";
+
+                Console.WriteLine($" - [{d.Date.ToShortDateString()}] {d.Type} - {propertyAddress}");
+                Console.WriteLine($"   Agent: {agentName}, Total Price Paid: ${d.FinalPrice:F2}");
             }
         }
 
@@ -127,6 +136,27 @@ namespace Presentation
                     _savedSearchService.AddSavedSearch(_currentClient.Id, filter, desc);
                     Console.WriteLine("Search saved.");
                 }
+            }
+        }
+
+        private void ViewMyMatchedProperties()
+        {
+            Console.WriteLine("--- Matched properties for you ---");
+
+            var matchedProperties = _matchingService.GetMatchingPropertiesForClient(_currentClient.Id);
+
+            if (!matchedProperties.Any())
+            {
+                Console.WriteLine("There are not any matched properties for your saved searches.");
+                return;
+            }
+
+            Console.WriteLine($"\n--- Found {matchedProperties.Count} properties ---");
+            foreach (var p in matchedProperties)
+            {
+                var landmarksString = string.Join(", ", (p.Landmarks ?? Enumerable.Empty<LandmarkInfo>()).Select(lm => $"{lm.Name} ({lm.TravelTimeMinutes} min)"));
+                Console.WriteLine($" - {p.PropertyType} on {p.Address} (${p.Price}) [Status: {p.CurrentStatus}]");
+                Console.WriteLine($"   Landmarks: [{landmarksString}]");
             }
         }
     }

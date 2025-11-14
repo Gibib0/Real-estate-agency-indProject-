@@ -4,17 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessLogic.Models;
+using BusinessLogic.Services;
 using Persistence;
 
-namespace BusinessLogic.Services
+namespace Persistence.JSONImplementations
 {
-    public class SavedSearchService
+    public class JSONSavedSearchService : ISavedSearchService
     {
         private List<SaveSearch> _savedSearches;
         private JSONDataService _jsonDataService;
         private string _filePath = @"Data/savedSearchesData.json";
 
-        public SavedSearchService()
+        public JSONSavedSearchService()
         {
             _jsonDataService = new JSONDataService();
             _savedSearches = _jsonDataService.LoadFromFile<SaveSearch>(_filePath);

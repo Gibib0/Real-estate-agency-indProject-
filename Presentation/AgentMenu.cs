@@ -9,19 +9,21 @@ namespace Presentation
     public class AgentMenu
     {
         private readonly Agent _currentAgent;
-        private readonly AgentService _agentService;
-        private readonly PropertyService _propertyService;
-        private readonly ClientService _clientService;
-        private readonly DealService _dealService;
+        private readonly IAgentService _agentService;
+        private readonly IPropertyService _propertyService;
+        private readonly IClientService _clientService;
+        private readonly IDealService _dealService;
+        private readonly ISavedSearchService _savedSearchService;
         private readonly MatchingService _matchingService;
 
-        public AgentMenu(Agent currentAgent, AgentService agentService, PropertyService propertyService, ClientService clientService, DealService dealService, SavedSearchService savedSearchService, MatchingService matchingService)
+        public AgentMenu(Agent currentAgent, IAgentService agentService, IPropertyService propertyService, IClientService clientService, IDealService dealService, ISavedSearchService savedSearchService, MatchingService matchingService)
         {
             _currentAgent = currentAgent;
             _agentService = agentService;
             _propertyService = propertyService;
             _clientService = clientService;
             _dealService = dealService;
+            _savedSearchService = savedSearchService;
             _matchingService = matchingService;
         }
 
@@ -44,33 +46,15 @@ namespace Presentation
                 string choice = ConsoleHelpers.GetString("Your choice:").ToUpper();
                 switch (choice)
                 {
-                    case "1":
-                        AddProperty();
-                        break;
-                    case "2":
-                        AddClient();
-                        break;
-                    case "3":
-                        AddDeal();
-                        break;
-                    case "4":
-                        ViewMyDeals();
-                        break;
-                    case "5":
-                        ViewMyClients();
-                        break;
-                    case "6":
-                        ChangePropertyStatus();
-                        break;
-                    case "7":
-                        MatchPropertiesToClient();
-                        break;
-                    case "0":
-                        isRunning = false;
-                        break;
-                    default:
-                        Console.WriteLine("Wrong choice.");
-                        break;
+                    case "1": AddProperty(); break;
+                    case "2": AddClient(); break;
+                    case "3": AddDeal(); break;
+                    case "4": ViewMyDeals(); break;
+                    case "5": ViewMyClients(); break;
+                    case "6": ChangePropertyStatus(); break;
+                    case "7": MatchPropertiesToClient(); break;
+                    case "0": isRunning = false; break;
+                    default: Console.WriteLine("Wrong choice."); break;
                 }
                 if (isRunning) ConsoleHelpers.PressAnyKeyToContinue();
             }
@@ -116,7 +100,7 @@ namespace Presentation
         private void ViewMyDeals()
         {
             Console.WriteLine($"--- ({_currentAgent.FullName}) deals ---");
-            var myDeals = _dealService.GetDeals().Where(d => d.Agent.Id == _currentAgent.Id).ToList();
+            var myDeals = _dealService.GetDeals().Where(d => d.AgentId == _currentAgent.Id).ToList();
             if (!myDeals.Any())
             {
                 Console.WriteLine("There are not any deals.");
@@ -124,28 +108,34 @@ namespace Presentation
             }
             foreach (var d in myDeals)
             {
-                Console.WriteLine($" - [{d.Date.ToShortDateString()}] {d.Type} - {d.Property.Address}");
-                Console.WriteLine($"   Client: {d.Client.FullName}, Price: ${d.FinalPrice}, Commission: ${d.CommissionAmount}");
+                string clientName = d.Client?.FullName ?? "N/A";
+                string propertyAddress = d.Property?.Address ?? "N/A";
+
+                Console.WriteLine($" - [{d.Date.ToShortDateString()}] {d.Type} - {propertyAddress}");
+                Console.WriteLine($"   Client: {clientName}, Base Price: ${d.BasePrice:F2}, Commission: ${d.CommissionAmount:F2}");
             }
         }
 
         private void ViewMyClients()
         {
             Console.WriteLine($"--- ({_currentAgent.FullName}) clients ---");
-            var myClients = _dealService.GetDeals()
-                .Where(d => d.Agent.Id == _currentAgent.Id)
-                .Select(d => d.Client)
+            var myClientIds = _dealService.GetDeals()
+                .Where(d => d.AgentId == _currentAgent.Id)
+                .Select(d => d.ClientId)
                 .Distinct()
                 .ToList();
 
-            if (!myClients.Any())
+            if (!myClientIds.Any())
             {
                 Console.WriteLine("There are not any clients.");
                 return;
             }
+
+            var myClients = _clientService.GetClients().Where(c => myClientIds.Contains(c.Id)).ToList();
+
             foreach (var c in myClients)
             {
-                Console.WriteLine($" - {c.FullName}, Email: {c.Email}, Тел: {c.Phone}");
+                Console.WriteLine($" - {c.FullName}, Email: {c.Email}, Tel: {c.Phone}");
             }
         }
 
@@ -155,7 +145,7 @@ namespace Presentation
             var properties = _propertyService.GetProperties();
             for (int i = 0; i < properties.Count; i++)
             {
-                Console.WriteLine($"{i + 1}. {properties[i].Address} (Статус: {properties[i].CurrentStatus})");
+                Console.WriteLine($"{i + 1}. {properties[i].Address} (Status: {properties[i].CurrentStatus})");
             }
             int choice = ConsoleHelpers.GetInt("Choose a property:") - 1;
             if (choice < 0 || choice >= properties.Count)
@@ -192,7 +182,6 @@ namespace Presentation
             Console.WriteLine("--- Deal adding ---");
 
             Console.WriteLine("\nChoose property:");
-
             var availableProperties = _propertyService.GetProperties()
                 .Where(p => p.CurrentStatus == Property.Status.OnSale || p.CurrentStatus == Property.Status.Rent)
                 .ToList();
@@ -217,10 +206,8 @@ namespace Presentation
             }
             Property selectedProperty = availableProperties[propChoice];
 
-
             Console.WriteLine("\nChoose client:");
             var allClients = _clientService.GetClients();
-
             if (!allClients.Any())
             {
                 Console.WriteLine("There are not any clients.");
@@ -240,13 +227,17 @@ namespace Presentation
             }
             Client selectedClient = allClients[clientChoice];
 
-
             Console.WriteLine($"\nChose: {selectedProperty.Address} and {selectedClient.FullName}");
 
-            decimal commissionPercent = ConsoleHelpers.GetDecimal("Comission percent:");
             decimal basePrice = selectedProperty.Price;
+            decimal commissionPercent = ConsoleHelpers.GetDecimal("Comission percent:");
+
             decimal commissionAmount = basePrice * (commissionPercent / 100);
             decimal finalPrice = basePrice + commissionAmount;
+
+            Console.WriteLine($"Property Price: ${basePrice:F2}");
+            Console.WriteLine($"Commission ({commissionPercent}%): ${commissionAmount:F2}");
+            Console.WriteLine($"TOTAL (Final Price): ${finalPrice:F2}");
 
             DealType dealType;
             if (selectedProperty.CurrentStatus == Property.Status.OnSale)
